@@ -1,0 +1,57 @@
+pipeline {
+    agent any // Use any available agent
+    environment {
+        // Define environment variables
+        PROJECT_NAME = "MyProject"
+        BUILD_VERSION = "1.0.${env.BUILD_NUMBER}"
+    }
+    options {
+        // General pipeline options
+        timeout(time: 60, unit: 'MINUTES')  // Fail the build if it exceeds 60 minutes
+        timestamps()                       // Add timestamps to the logs
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "Checking out the source code..."
+                checkout scm // Checkout source from the configured SCM
+            }
+        }
+        stage('Build') {
+            steps {
+                echo "Building the project..."
+                sh './build-script.sh' // Replace with your actual build command
+            }
+        }
+        stage('Test') {
+            steps {
+                echo "Running tests..."
+                sh './test-script.sh' // Replace with your test command
+            }
+        }
+        stage('Package') {
+            steps {
+                echo "Packaging the application..."
+                sh './package-script.sh' // Replace with your packaging command
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo "Deploying the application..."
+                sh './deploy-script.sh' // Replace with your deployment command
+            }
+        }
+    }
+    post {
+        always {
+            echo "Cleaning up workspace..."
+            cleanWs() // Clean up the workspace after build
+        }
+        success {
+            echo "Build and deployment succeeded!"
+        }
+        failure {
+            echo "Build or deployment failed!"
+        }
+    }
+}
